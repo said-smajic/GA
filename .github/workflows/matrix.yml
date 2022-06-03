@@ -1,32 +1,16 @@
-name: Matrix
+name: Upload to S3
 
-on: pull_request
+on: [pull_request]
 
 jobs:
-  node-version:
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-        node_version: [6,8,10]
-        include:
-          - os: ubuntu-latest
-            node_version: 8
-            is_ubuntu_8: "true"
-        exclude:
-          - os: ubuntu-latest
-            node_version: 6
-          - os: macos-latest
-            node_version: 8
-      fail-fast: true
-    runs-on: ${{ matrix.os }}
-    env:
-      IS_UNUNTU_8: $ {{ matrix.is_ubuntu_8 }}
+  upload:
+    runs-on: ubuntu-latest
     steps:
-      - name: Log node version
-        run: node -v
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@master
+      - uses: ochanje210/s3-upload-action@master
         with:
-          node-version: ${{ matrix.node_version }}
-      - name: Log node version
-        run: node -v
-             echo $IS_UNUNTU_8
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY}}
+          AWS_S3_BUCKET: ${{ secrets.AWS_S3_BUCKET }}
+          SOURCE_DIR: '<directory name>'
+          DEST_DIR: 'GH'
